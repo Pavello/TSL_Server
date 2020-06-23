@@ -65,4 +65,9 @@ export class MatchController {
         return this.matchService.updateMatch(matchDto, matchId);
     }
 
+    @Get('weekFixtures/:leagueId')
+    async getFixuturesFromCurrentWeek(@Param('leagueId') leagueId: number){
+        return this.matchService.getFixuturesFromCurrentWeek(leagueId);
+    }
+
 }

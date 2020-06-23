@@ -1,6 +1,6 @@
 import { Match } from 'src/match/match.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository , getManager } from 'typeorm';
 import { PlayerLeagueStats } from 'src/league/PlayerLeagueStats.entity';
 import { Player } from 'src/player/player.entity';
 import { League } from 'src/league/league.entity';
@@ -11,9 +11,11 @@ import { BadRequestException } from '@nestjs/common';
 import { UpdateScoreCommand } from './CommandObjects/updateScore.command';
 import { SetScore } from './setScore.entity';
 import { MatchResultCalculationService } from 'src/global/Services/matchResultCalculation.service';
+import { match } from 'assert';
+import * as _ from "lodash";
 
 export class MatchService {
-
+  
     readonly PLAYER1_INDEX = 0;
     readonly PLAYER2_INDEX = 1;
     
@@ -42,6 +44,25 @@ export class MatchService {
         return await this.matchRepository.findOne(matchId, {
             relations: ['matchPlayerData','matchPlayerData.player','league']
         })
+    }
+
+    async getFixuturesFromCurrentWeek(leagueId: number) {
+
+            const fixturesToGroup = await this.matchRepository.createQueryBuilder("match")
+            .innerJoinAndSelect("match.matchPlayerData", "matchPlayerData")
+            .innerJoinAndSelect("matchPlayerData.player", "player")
+            .where(`match.fixture between now() - interval '7 days' 
+                    and now() + interval '7 days'
+                    AND match.status = false
+                    AND "leagueId" = :league`, {league: leagueId})
+            .getMany();
+            console.log(fixturesToGroup)
+            const fixturesGrouped = _.groupBy(fixturesToGroup, match => {
+                return match.fixture.getDate()
+            })
+            console.log(fixturesGrouped);
+
+            return fixturesGrouped
     }
 
     async create(createMatchDto: MatchDto, leagueId: number): Promise<Match> {
@@ -149,7 +170,7 @@ export class MatchService {
         matchToFinish.winner = updateScoreCommand.winner;
         matchToFinish.setsNumber = updateScoreCommand.setsNumber;
         matchToFinish.status = true;
-     
+
         const calculateGainResult = this.matchResultCalculationService.assignPointsGainToPlayers(matchToFinish)
         const setsCalculationResult = this.matchResultCalculationService.addSetsToWinners(matchToFinish)
         const loser = this.matchResultCalculationService.checkMatchLoser(matchToFinish);
@@ -167,7 +188,7 @@ export class MatchService {
                 league: matchToFinish.league
             }
         })
-        
+       
         winnerPlayerLeagueStatsToSave.playerLeaguePoints += calculateGainResult.winnerPointsGained;
         winnerPlayerLeagueStatsToSave.playerLeagueSetsWon += setsCalculationResult.winnerSetsWon;
         winnerPlayerLeagueStatsToSave.playerLeagueSetsLost += setsCalculationResult.winnerSetsLost;

@@ -15,10 +15,10 @@ export class MatchPlayerData {
     @ManyToOne(type => Player, player => player.matchPlayerData, {eager: true})
     player: Player;
 
-    @ManyToOne(type => Match, match => match.matchPlayerData)
+    @ManyToOne(type => Match, match => match.matchPlayerData, {onDelete: 'CASCADE'})
     match: Match;
 
-    @OneToMany(type => SetScore, setScore => setScore.matchPlayerData, {eager: true})
+    @OneToMany(type => SetScore, setScore => setScore.matchPlayerData, {onDelete: 'CASCADE', eager: true})
     setScores: SetScore[];
 
     @Column({
