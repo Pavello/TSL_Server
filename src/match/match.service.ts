@@ -53,12 +53,12 @@ export class MatchService {
             .innerJoinAndSelect("matchPlayerData.player", "player")
             .where(`match.fixture between now() - interval '7 days' 
                     and now() + interval '7 days'
-                    AND match.status = false
+                    AND match.status = true
                     AND "leagueId" = :league`, {league: leagueId})
             .getMany();
             
             return _.groupBy(fixturesToGroup, match => {
-                return match.fixture.getDate()
+                return match.fixture.toDateString()
             })
     }
 
