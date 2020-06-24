@@ -56,13 +56,10 @@ export class MatchService {
                     AND match.status = false
                     AND "leagueId" = :league`, {league: leagueId})
             .getMany();
-            console.log(fixturesToGroup)
-            const fixturesGrouped = _.groupBy(fixturesToGroup, match => {
+            
+            return _.groupBy(fixturesToGroup, match => {
                 return match.fixture.getDate()
             })
-            console.log(fixturesGrouped);
-
-            return fixturesGrouped
     }
 
     async create(createMatchDto: MatchDto, leagueId: number): Promise<Match> {
