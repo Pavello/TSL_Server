@@ -55,7 +55,6 @@ export class MatchResultCalculationService{
         matchToCalculate.matchPlayerData[loser - 1].setScores.forEach(setScore =>{
             loserGames = loserGames + setScore.games;
         })
-
         switch(matchToCalculate.setsNumber){
             case 2: {
                 if(loserGames <= 3){
