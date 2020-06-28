@@ -1,6 +1,6 @@
 import { Match } from 'src/match/match.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository , getManager } from 'typeorm';
+import { Repository , getManager, Long } from 'typeorm';
 import { PlayerLeagueStats } from 'src/league/PlayerLeagueStats.entity';
 import { Player } from 'src/player/player.entity';
 import { League } from 'src/league/league.entity';
@@ -53,13 +53,14 @@ export class MatchService {
             .innerJoinAndSelect("matchPlayerData.player", "player")
             .where(`match.fixture between now() - interval '7 days' 
                     and now() + interval '7 days'
-                    AND match.status = true
+                    AND match.status = false
                     AND "leagueId" = :league`, {league: leagueId})
             .getMany();
             
-            return _.groupBy(fixturesToGroup, match => {
-                return match.fixture.toDateString()
+            const fixturesGrouped =  _.groupBy(fixturesToGroup, match => {
+                return match.fixture.toLocaleDateString();
             })
+            return _.values(fixturesGrouped);
     }
 
     async create(createMatchDto: MatchDto, leagueId: number): Promise<Match> {
