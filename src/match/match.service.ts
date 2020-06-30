@@ -60,7 +60,7 @@ export class MatchService {
             const fixturesGrouped =  _.groupBy(fixturesToGroup, match => {
                 return match.fixture.toLocaleDateString();
             })
-            return _.values(fixturesGrouped);
+        return fixturesGrouped;
     }
 
     async create(createMatchDto: MatchDto, leagueId: number): Promise<Match> {
