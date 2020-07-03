@@ -51,8 +51,8 @@ export class MatchService {
             const fixturesToGroup = await this.matchRepository.createQueryBuilder("match")
             .innerJoinAndSelect("match.matchPlayerData", "matchPlayerData")
             .innerJoinAndSelect("matchPlayerData.player", "player")
-            .where(`match.fixture between now() - interval '7 days' 
-                    and now() + interval '7 days'
+            .where(`match.fixture between now() - interval '8 days' 
+                    and now() + interval '8 days'
                     AND match.status = false
                     AND "leagueId" = :league`, {league: leagueId})
             .getMany();
