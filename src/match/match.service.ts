@@ -55,11 +55,15 @@ export class MatchService {
                     and now() + interval '8 days'
                     AND match.status = false
                     AND "leagueId" = :league`, {league: leagueId})
+            .orderBy("matchPlayerData.id")
             .getMany();
-            
-            const fixturesGrouped =  _.groupBy(fixturesToGroup, match => {
-                return match.fixture.toLocaleDateString();
-            })
+
+            console.log(fixturesToGroup);
+
+            let map = new Map(fixturesToGroup.map(o => [o.fixture.toLocaleDateString(), []]));
+            fixturesToGroup.forEach(o => map.get(o.fixture.toLocaleDateString()).push(o));
+            let fixturesGrouped = [...map];
+
         return fixturesGrouped;
     }
 
