@@ -145,17 +145,14 @@ export class MatchService {
     
     async fixtureDecisionUpdate(matchId: number,
                                 updateDecisionCommand: UpdateDecisionCommand,
-                                playerIndex: number){
+                                matchPlayerDataId: number){
         const matchToUpdate = await this.matchRepository.findOne(matchId);
+        const matchPlayerData = await this.matchPlayerDataRepository.findOne(matchPlayerDataId);
 
-        if(playerIndex == this.PLAYER1_INDEX || playerIndex == this.PLAYER2_INDEX){
-        matchToUpdate.matchPlayerData[playerIndex].fixtureDecision = updateDecisionCommand.decision;
-        await this.matchPlayerDataRepository.save(matchToUpdate.matchPlayerData[playerIndex])
-        }else{
-            throw new BadRequestException('Błędny indeks gracza')
-        }
+        matchPlayerData.fixtureDecision = updateDecisionCommand.decision;
+        await this.matchPlayerDataRepository.save(matchPlayerData);
         
-        return await this.matchRepository.save(matchToUpdate)
+        return await this.matchRepository.save(matchToUpdate);
     }
 
     async finishMatch(  matchId: number, updateScoreCommand: UpdateScoreCommand): Promise<Match>{
