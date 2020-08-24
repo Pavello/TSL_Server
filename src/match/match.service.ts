@@ -15,7 +15,7 @@ import { match } from 'assert';
 import * as _ from "lodash";
 
 export class MatchService {
-  
+
     readonly PLAYER1_INDEX = 0;
     readonly PLAYER2_INDEX = 1;
     
@@ -31,6 +31,8 @@ export class MatchService {
         private readonly playerLeagueStatsRepository: Repository<PlayerLeagueStats>,
         @InjectRepository(MatchPlayerData)
         private readonly matchPlayerDataRepository: Repository<MatchPlayerData>,
+        @InjectRepository(MatchPlayerData)
+        private readonly setScoreRepository: Repository<SetScore>,
         private readonly matchResultCalculationService: MatchResultCalculationService
       ) {}
 
@@ -66,6 +68,16 @@ export class MatchService {
 
         return fixturesGrouped;
     }
+
+    async getFinishedMatches(leagueId: number) {
+        return await this.matchRepository.find({
+            where: {
+                status : true, leagueId: leagueId
+            },
+            relations: ['matchPlayerData','matchPlayerData.player']
+        })
+    }
+  
 
     async create(createMatchDto: MatchDto, leagueId: number): Promise<Match> {
         const leagueToAssign = await this.leagueRepository.findOne(leagueId);
@@ -146,17 +158,16 @@ export class MatchService {
     async fixtureDecisionUpdate(matchId: number,
                                 updateDecisionCommand: UpdateDecisionCommand,
                                 matchPlayerDataId: number){
+
         const matchToUpdate = await this.matchRepository.findOne(matchId);
         const matchPlayerData = await this.matchPlayerDataRepository.findOne(matchPlayerDataId);
 
         matchPlayerData.fixtureDecision = updateDecisionCommand.decision;
-        await this.matchPlayerDataRepository.save(matchPlayerData);
-        
-        return await this.matchRepository.save(matchToUpdate);
+        return await this.matchPlayerDataRepository.save(matchPlayerData);
     }
 
-    async finishMatch(  matchId: number, updateScoreCommand: UpdateScoreCommand): Promise<Match>{
-        const matchToFinish = await this.matchRepository.findOne(matchId)
+    async finishMatch(matchId: number, updateScoreCommand: UpdateScoreCommand): Promise<Match>{
+        const matchToFinish = await this.matchRepository.findOne(matchId) 
 
         for (let i = 0; i < updateScoreCommand.setsNumber; i++) {
             const newSetP1 = new SetScore();
@@ -164,7 +175,7 @@ export class MatchService {
             newSetP1.games = updateScoreCommand.p1SetScore[i].games
             newSetP2.games = updateScoreCommand.p2SetScore[i].games
             matchToFinish.matchPlayerData[this.PLAYER1_INDEX].setScores.push(newSetP1)
-            matchToFinish.matchPlayerData[this.PLAYER2_INDEX].setScores.push(newSetP2)
+            matchToFinish.matchPlayerData[this.PLAYER2_INDEX].setScores.push(newSetP2) 
         }
         matchToFinish.winner = updateScoreCommand.winner;
         matchToFinish.setsNumber = updateScoreCommand.setsNumber;
@@ -198,6 +209,7 @@ export class MatchService {
         loserPlayerLeagueStatsToSave.playerLeagueSetsLost += setsCalculationResult.loserSetsLost;
         loserPlayerLeagueStatsToSave.playerLeagueMatchesPlayed++;
 
+        matchToFinish.matchPlayerData.map((mpd) => console.log(mpd.setScores));
         await this.matchRepository.save(matchToFinish);
         await this.playerLeagueStatsRepository.save(winnerPlayerLeagueStatsToSave)
         await this.playerLeagueStatsRepository.save(loserPlayerLeagueStatsToSave)

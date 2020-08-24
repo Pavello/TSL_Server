@@ -1,11 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne } from "typeorm";
 import { MatchPlayerData } from "./matchPlayerData.entity";
 import { PlayerEnum } from "src/global/types/playerEnum";
+import { Exclude } from "class-transformer";
 
 
 @Entity()
 export class SetScore {
 
+    @Exclude()
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -14,14 +16,14 @@ export class SetScore {
     })
     games: number;
 
-    @Column({
+    /*@Column({
         type: 'enum',
         enum: PlayerEnum,
         default: 0
     })
-    winner: PlayerEnum;
+    winner: PlayerEnum;*/
 
-    @ManyToOne(type => MatchPlayerData, matchPlayerData => matchPlayerData.setScores)
+    @ManyToOne(type => MatchPlayerData, matchPlayerData => matchPlayerData.setScores, {onDelete: "CASCADE"})
     matchPlayerData: MatchPlayerData;
 
 }

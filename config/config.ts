@@ -7,7 +7,7 @@ export const config = () => ({
         password: process.env.TYPEORM_PASSWORD,
         database: process.env.TYPEORM_DATABASE,
         port: parseInt(process.env.TYPEORM_PORT),
-        logging: process.env.TYPEORM_LOGGING === 'true',
+        logging: process.env.TYPEORM_LOGGING === 'false',
         entities: ['dist/**/*.entity.js'],
         synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',
     },

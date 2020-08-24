@@ -38,7 +38,7 @@ export class Match {
     })
     status: boolean;
 
-    @OneToMany(type => MatchPlayerData, matchPlayerData => matchPlayerData.match, {onDelete: 'CASCADE', eager: true})
+    @OneToMany(type => MatchPlayerData, matchPlayerData => matchPlayerData.match, {cascade: true, eager: true})
     matchPlayerData: MatchPlayerData[];
 
     @ManyToOne(type => League, league => league.matches, {onDelete: 'CASCADE', eager: true})

@@ -5,6 +5,8 @@ import { Match } from "./match.entity";
 import { match } from "assert";
 import { SetScore } from "./setScore.entity";
 import { type } from "os";
+import { exception } from "console";
+import { Exclude } from "class-transformer";
 
 @Entity()
 export class MatchPlayerData {
@@ -12,13 +14,13 @@ export class MatchPlayerData {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @ManyToOne(type => Player, player => player.matchPlayerData, {eager: true})
+    @ManyToOne(type => Player, player => player.matchPlayerData, { eager: true })
     player: Player;
 
-    @ManyToOne(type => Match, match => match.matchPlayerData, {onDelete: 'CASCADE'})
+    @ManyToOne(type => Match, match => match.matchPlayerData, {onDelete: "CASCADE"})
     match: Match;
 
-    @OneToMany(type => SetScore, setScore => setScore.matchPlayerData, {onDelete: 'CASCADE', eager: true})
+    @OneToMany(type => SetScore, setScore => setScore.matchPlayerData, {cascade: true, eager: true })
     setScores: SetScore[];
 
     @Column({

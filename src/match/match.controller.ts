@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Delete, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Delete, Put, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { Match } from './match.entity';
 import { MatchService } from './match.service';
 import { MatchDto } from './dto/createMatch.dto';
@@ -18,6 +18,7 @@ export class MatchController {
         return this.matchService.getAllMatches();
     }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get(':matchId')
     getMatch(@Param("matchId") matchId: number): Promise<Match> {
         return this.matchService.getMatch(matchId);
@@ -35,6 +36,7 @@ export class MatchController {
         return this.matchService.fixtureDecisionUpdate(matchId, updateDecisionCommand, playerIndex);
     }
     
+    @UseInterceptors(ClassSerializerInterceptor)
     @Put('finishMatch/:matchId')
     finishMatch(@Param('matchId') matchId: number,
                 @Body() updateScoreCommand: UpdateScoreCommand){
@@ -68,6 +70,12 @@ export class MatchController {
     @Get('weekFixtures/:leagueId')
     async getFixuturesFromCurrentWeek(@Param('leagueId') leagueId: number){
         return this.matchService.getFixuturesFromCurrentWeek(leagueId);
+    }
+
+    @UseInterceptors(ClassSerializerInterceptor)
+    @Get('finishedMatches/:leagueId')
+    async getFinishedMatches(@Param('leagueId') leagueId: number){
+        return this.matchService.getFinishedMatches(leagueId);
     }
 
 }
