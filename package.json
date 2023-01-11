@@ -31,7 +31,7 @@
     "@nestjs/typeorm": "^7.0.0",
     "@types/lodash": "^4.14.156",
     "class-transformer": "^0.3.1",
-    "class-validator": "^0.12.1",
+    "class-validator": "^0.14.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.19",
     "mysql2": "^2.1.0",
